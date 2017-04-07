@@ -1,0 +1,153 @@
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Simple images gallery with jQuery</title>
+        <style>
+            #div-gallery {
+                text-align: center;
+            }
+            #div-gallery img {
+                width: 30%;
+                margin-right: auto;
+                margin-left: auto;
+            }
+            div#modal-gallery {
+                top: 0;
+                left: 0;
+                width: 100%;
+                max-width: none;
+                height: 100vh;
+                min-height: 100vh;
+                margin-left: 0;
+                border: 0;
+                border-radius: 0;
+                z-index: 1006;
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+                display: none;
+                background-color: #fefefe;
+                position: relative;
+                margin-right: auto;
+                overflow-y: auto;
+                padding: 0;
+            }
+            div#modal-gallery div.header {
+                position: relative; 
+            }
+            div#modal-gallery div.header h2 {
+                margin-left: 1rem; 
+            }
+            div#modal-gallery div.header button.close-button {
+                position: absolute;
+                top: calc(50% - 1em);
+                right: 1rem;
+                width: 2em;
+                height: 2em;
+            }
+            div#modal-gallery img {
+                display: block;
+                max-width: 98%;
+                margin-right: auto;
+                margin-left: auto;
+            }
+            div#modal-gallery div.text-center {
+                position: relative;
+            }
+            button.next {
+                position: absolute;
+                top: 50%;
+                right: 1rem;
+            }
+            button.prev {
+                position: absolute;
+                top: 50%;
+                left: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Gallery images</h1>
+        <div id="div-gallery">
+            <a href="#Gallery+image+1"><img src="//placehold.it/300x300?text=Gallery+image+1" alt=""></a>
+            <a href="#Gallery+image+2"><img src="//placehold.it/300x300?text=Gallery+image+2" alt=""></a>
+            <a href="#Gallery+image+3"><img src="//placehold.it/300x300?text=Gallery+image+3" alt=""></a>
+            <a href="#Gallery+image+4"><img src="//placehold.it/300x300?text=Gallery+image+4" alt=""></a>
+            <a href="#Gallery+image+5"><img src="//placehold.it/300x300?text=Gallery+image+5" alt=""></a>
+            <a href="#Gallery+image+6"><img src="//placehold.it/300x300?text=Gallery+image+6" alt=""></a>
+            <a href="#Gallery+image+7"><img src="//placehold.it/300x300?text=Gallery+image+7" alt=""></a>
+            <a href="#Gallery+image+8"><img src="//placehold.it/300x300?text=Gallery+image+8" alt=""></a>
+            <a href="#Gallery+image+9"><img src="//placehold.it/300x300?text=Gallery+image+9" alt=""></a>
+        </div>
+        <div id="modal-gallery">
+            <div class="header">
+                <button class="close-button" type="button">
+                    &times;
+                </button>
+                <h2>Gallery image</h2>
+            </div>
+            <div class="text-center">
+                <img id="gallery-img" src="" alt="Intropsective Cage">
+                <button class="prev" type="button">
+                    prev
+                </button>
+                <button class="next" type="button">
+                    next
+                </button>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+        <script>
+            var galleryImages = [];
+            var galleryImagesSrcs = [];
+            var galleryImagesNum = 0;
+            var counter;
+            var h2;
+            $('button.prev').click(function() {
+                var $currImg = counter >= 1 ? galleryImages[--counter] : galleryImages[counter];
+                var $currHash = galleryImagesSrcs[counter];
+                var src = $currImg.src;
+                window.location.hash = $currHash;
+                $("img#gallery-img").attr("src", src);
+                $("div#modal-gallery h2").text(h2 + " " + (counter + 1));
+            });
+            $('button.next').click(function() {
+                var $currImg = counter < (galleryImagesNum - 1) ? galleryImages[++counter] : galleryImages[counter];
+                var $currHash = galleryImagesSrcs[counter];
+                var src = $currImg.src;
+                window.location.hash = $currHash;
+                $("img#gallery-img").attr("src", src);
+                $("div#modal-gallery h2").text(h2 + " " + (counter + 1));
+            });
+            $('div#div-gallery a').click(function(event) {
+                event.preventDefault();
+                $("#modal-gallery").css("position", "fixed");
+                $("#modal-gallery").show();
+                $("body").css("overflow", "hidden");
+                var $currHash = this.hash.substr(1);
+                counter = galleryImagesSrcs.indexOf($currHash); 
+                var src = "//placehold.it/1200x1200?text="+$currHash;
+                window.location.hash = $currHash;
+                $("img#gallery-img").attr("src", src);
+                $("div#modal-gallery h2").text(h2 + " " + (counter + 1));
+            });
+            $('div#modal-gallery button.close-button').click(function() {
+                $("#modal-gallery").css("position", "relative");
+                $("#modal-gallery").hide();
+                $("body").css("overflow", "visible");
+            });
+            $(document).on("ready", function() {
+                h2 = $("div#modal-gallery h2").text();
+                $("div#div-gallery a").each(function(index, element) {
+                    var currHash = element.hash.substr(1);
+                    var img = new Image();
+                    img.src = "//placehold.it/1200x1200?text="+currHash;
+                    galleryImages.push(img);
+                    galleryImagesSrcs.push(currHash);
+                });
+                galleryImagesNum = galleryImages.length;
+            });
+        </script>
+    </body>
+</html>
