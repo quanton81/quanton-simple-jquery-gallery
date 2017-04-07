@@ -9,7 +9,6 @@
                 text-align: center;
             }
             #div-gallery img {
-                width: 30%;
                 margin-right: auto;
                 margin-left: auto;
             }
@@ -79,6 +78,17 @@
             <a href="#Gallery+image+7"><img src="//placehold.it/300x300?text=Gallery+image+7" alt=""></a>
             <a href="#Gallery+image+8"><img src="//placehold.it/300x300?text=Gallery+image+8" alt=""></a>
             <a href="#Gallery+image+9"><img src="//placehold.it/300x300?text=Gallery+image+9" alt=""></a>
+            <a href="#Gallery+image+10"><img src="//placehold.it/300x300?text=Gallery+image+10" alt=""></a>
+            <a href="#Gallery+image+11"><img src="//placehold.it/300x300?text=Gallery+image+11" alt=""></a>
+            <a href="#Gallery+image+12"><img src="//placehold.it/300x300?text=Gallery+image+12" alt=""></a>
+            <a href="#Gallery+image+13"><img src="//placehold.it/300x300?text=Gallery+image+13" alt=""></a>
+            <a href="#Gallery+image+14"><img src="//placehold.it/300x300?text=Gallery+image+14" alt=""></a>
+            <a href="#Gallery+image+15"><img src="//placehold.it/300x300?text=Gallery+image+15" alt=""></a>
+            <a href="#Gallery+image+16"><img src="//placehold.it/300x300?text=Gallery+image+16" alt=""></a>
+            <a href="#Gallery+image+17"><img src="//placehold.it/300x300?text=Gallery+image+17" alt=""></a>
+            <a href="#Gallery+image+18"><img src="//placehold.it/300x300?text=Gallery+image+18" alt=""></a>
+            <a href="#Gallery+image+19"><img src="//placehold.it/300x300?text=Gallery+image+19" alt=""></a>
+            <a href="#Gallery+image+20"><img src="//placehold.it/300x300?text=Gallery+image+20" alt=""></a>
         </div>
         <div id="modal-gallery">
             <div class="header">
@@ -99,6 +109,8 @@
         </div>
         <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
         <script>
+            var windowWidth;
+            var thumbnailWidth;
             var galleryImages = [];
             var galleryImagesSrcs = [];
             var galleryImagesNum = 0;
@@ -138,6 +150,16 @@
                 $("body").css("overflow", "visible");
             });
             $(document).on("ready", function() {
+                windowWidth = $(window).width();
+                var $thumbnailHref = $("#div-gallery").find("img:first").attr("src");
+                var thumbImg = new Image();
+                thumbImg.src = $thumbnailHref;
+                thumbImg.onload = function() {
+                    thumbnailWidth = this.width;
+                    if(windowWidth > 0 && thumbnailWidth > 0) {
+                        $("#div-gallery img").css("width", (Math.ceil(thumbnailWidth * 100 / windowWidth))+'%');
+                    }
+                };
                 h2 = $("div#modal-gallery h2").text();
                 $("div#div-gallery a").each(function(index, element) {
                     var currHash = element.hash.substr(1);
