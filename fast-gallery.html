@@ -44,8 +44,6 @@
                 position: absolute;
                 top: calc(50% - 1em);
                 right: 1rem;
-                width: 2em;
-                height: 2em;
             }
             div#modal-gallery img {
                 display: block;
@@ -56,12 +54,32 @@
             div#modal-gallery div.text-center {
                 position: relative;
             }
-            button.next {
+            button.next-button, button.prev-button, button.close-button {
+                display: inline-block;
+                vertical-align: middle;
+                margin: 0 0 1rem 0;
+                padding: 0.35em 0.5em;
+                -webkit-appearance: none;
+                border: 1px solid transparent;
+                border-radius: 3px;
+                transition: background-color 0.25s ease-out, color 0.25s ease-out;
+                font-size: 0.9rem;
+                line-height: 1;
+                text-align: center;
+                cursor: pointer;
+                background-color: #ccc;
+                color: #000; 
+            }
+            button.next-button:hover, button.prev-button:hover, button.close-button:hover, button.next-button:focus, button.prev-button:focus, button.close-button:focus {
+              background-color: #aaa;
+              color: #ccc;
+            }
+            button.next-button {
                 position: absolute;
                 top: 50%;
                 right: 1rem;
             }
-            button.prev {
+            button.prev-button {
                 position: absolute;
                 top: 50%;
                 left: 1rem;
@@ -90,12 +108,18 @@
         </div>
         <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
         <script>
-            var createGallery = function(element, galleryTitle) {
-                var galleryImages = [];
-                var galleryImagesSrcs = [];
-                var galleryImagesNum = 0;
-                var counter;
-                var addModalGallery = function(){
+            var CreateGallery = function(parameters) {
+                var self = this;
+                this.galleryImages = [];
+                this.galleryImagesSrcs = [];
+                this.galleryImagesNum = 0;
+                this.counter;
+                this.galleryTitle = parameters.galleryTitle != undefined ? parameters.galleryTitle : 'Gallery image';
+                this.maxMobileWidth = parameters.maxMobileWidth != undefined ? parameters.maxMobileWidth : 768;
+                this.numMobileImg = parameters.numMobileImg != undefined ? parameters.numMobileImg : 2;
+                this.maxTabletWidth = parameters.maxTabletWidth != undefined ? parameters.maxTabletWidth : 1024;
+                this.numTabletImg = parameters.numTabletImg != undefined ? parameters.numTabletImg : 3;
+                this.addModalGallery = function(gallerySelf = self){
                     var $div = $(document.createElement('div')).attr({
                         'id': 'modal-gallery'
                     }).append($(document.createElement('div')).attr({
@@ -104,93 +128,111 @@
                                 'class': 'close-button',
                                 'type': 'button'
                             }).html('&times;')
-                        ).append($(document.createElement('h2')).text(galleryTitle))
+                        ).append($(document.createElement('h2')).text(gallerySelf.galleryTitle))
                     ).append($(document.createElement('div')).attr({
                             'class': 'text-center'
                         }).append($(document.createElement('img')).attr({
                                 'id': 'gallery-img'
                             })
                         ).append($(document.createElement('button')).attr({
-                                'class': 'prev',
+                                'class': 'prev-button',
                                 'type': 'button'
                             }).html('&#9668;')
                         ).append($(document.createElement('button')).attr({
-                                'class': 'next',
+                                'class': 'next-button',
                                 'type': 'button'
                             }).html('&#9658;')
                         )
                     );
-                    element.after($div);
+                    parameters.element.after($div);
                 };
-                $(document).on('click', 'button.prev', function() {
-                    var $currImg = counter >= 1 ? galleryImages[--counter] : galleryImages[counter];
-                    var $$currHash = galleryImagesSrcs[counter];
-                    var $src = $currImg.src;
-                    window.location.hash = $$currHash;
-                    $('img#gallery-img').attr('src', $src);
-                    $('div#modal-gallery h2').text(galleryTitle + ' ' + (counter + 1));
-                });
-                $(document).on('click', 'button.next', function() {
-                    var $currImg = counter < (galleryImagesNum - 1) ? galleryImages[++counter] : galleryImages[counter];
-                    var $currHash = galleryImagesSrcs[counter];
+                $(document).on('click', 'button.prev-button', {self: self}, function() {
+                    var $currImg = self.counter >= 1 ? self.galleryImages[--self.counter] : self.galleryImages[self.counter];
+                    var $currHash = self.galleryImagesSrcs[self.counter];
                     var $src = $currImg.src;
                     window.location.hash = $currHash;
                     $('img#gallery-img').attr('src', $src);
-                    $('div#modal-gallery h2').text(galleryTitle + ' ' + (counter + 1));
+                    $('div#modal-gallery h2').text(self.galleryTitle + ' ' + (self.counter + 1));
+                });
+                $(document).on('click', 'button.next-button', {self: self}, function() {
+                    var $currImg = self.counter < (self.galleryImagesNum - 1) ? self.galleryImages[++self.counter] : self.galleryImages[self.counter];
+                    var $currHash = self.galleryImagesSrcs[self.counter];
+                    var $src = $currImg.src;
+                    window.location.hash = $currHash;
+                    $('img#gallery-img').attr('src', $src);
+                    $('div#modal-gallery h2').text(self.galleryTitle + ' ' + (self.counter + 1));
                 });
                 $(document).on('click', 'div#modal-gallery button.close-button', function() {
                     $('#modal-gallery').css('position', 'relative');
                     $('#modal-gallery').hide();
                     $('body').css('overflow', 'visible');
                 });
-                element.find('a').click(function(event) {
+                parameters.element.find('a').on('click', {self: self}, function(event) {
                     event.preventDefault();
                     $('#modal-gallery').css('position', 'fixed');
                     $('#modal-gallery').show();
                     $('body').css('overflow', 'hidden');
                     var $currHash = this.hash.substr(1);
-                    counter = galleryImagesSrcs.indexOf($currHash); 
+                    self.counter = self.galleryImagesSrcs.indexOf($currHash); 
                     var $src = $currHash;
                     window.location.hash = $currHash;
                     $('img#gallery-img').attr('src', $src);
-                    $('div#modal-gallery h2').text(galleryTitle + ' ' + (counter + 1));
+                    $('div#modal-gallery h2').text(self.galleryTitle + ' ' + (self.counter + 1));
                 });
-                var startGallery =  function() {
+                this.sizeGallery = function(gallerySelf = self) {
                     var $modalGallery = $(document).find("div#modal-gallery");
                     if($modalGallery.length <= 0) {
-                        addModalGallery();
+                        this.addModalGallery();
                     }
                     var $windowWidth = $(window).width();
-                    var $parentWidth = element.width();
-                    var $thumbnailHref = element.find('img:first').attr('src');
-                    if($windowWidth < 768) {
-                        element.find('img').css('width', 'calc(50% - 0.4em - 4px)');
-                    } else if($windowWidth < 1024) {
-                        element.find('img').css('width', 'calc(33% - 0.4em - 4px)');
+                    var $parentWidth = parameters.element.width();
+                    var $thumbnailHref = parameters.element.find('img:first').attr('src');
+                    if($windowWidth < gallerySelf.maxMobileWidth) {
+                        var percentMobile = Math.floor(100 / gallerySelf.numMobileImg); 
+                        var emMobile = gallerySelf.numMobileImg * 0.4;
+                        var pxMobile = gallerySelf.numMobileImg * 2;
+                        parameters.element.find('img').css('width', 'calc('+percentMobile+'% - '+emMobile+'em - '+pxMobile+'px)');
+                    } else if($windowWidth < gallerySelf.maxTabletWidth) {
+                        var percentTablet = Math.floor(100 / gallerySelf.numTabletImg); 
+                        var emTablet = gallerySelf.numMobileImg * 0.4;
+                        var pxTablet = gallerySelf.numMobileImg * 2;
+                        parameters.element.find('img').css('width', 'calc('+percentTablet+'% - '+emTablet+'em - '+pxTablet+'px)');
                     } else {
                         var $thumbImg = new Image();
                         $thumbImg.src = $thumbnailHref;
                         $thumbImg.onload = function() {
                             var $thumbnailWidth = this.width;
                             if($parentWidth > 0 && $thumbnailWidth > 0) {
-                                element.find('img').css('width', (Math.ceil($thumbnailWidth * 100 / $parentWidth))+'%');
+                                parameters.element.find('img').css('width', (Math.ceil($thumbnailWidth * 100 / $parentWidth))+'%');
                             }
                         };
                     }
-                    element.find('a').each(function(index, element) {
-                        var $currHash = element.hash.substr(1);
+                };
+                this.startGallery = function(gallerySelf = self) {
+                    parameters.element.find('a').each(function(index, el) {
+                        var $currHash = el.hash.substr(1);
                         var $img = new Image();
                         $img.src = $currHash;
-                        galleryImages.push($img);
-                        galleryImagesSrcs.push($currHash);
+                        gallerySelf.galleryImages.push($img);
+                        gallerySelf.galleryImagesSrcs.push($currHash);
                     });
-                    galleryImagesNum = galleryImages.length;
+                    this.galleryImagesNum = this.galleryImages.length;
                 };
-                startGallery();
-                return this;
+                this.sizeGallery();
+                this.startGallery();
             };
-            $(window).on('load resize', function() {
-                createGallery($('#div-gallery'), 'Gallery image');
+            var myGallery;
+            $(window).on('load', function() {
+                myGallery = new CreateGallery({
+                    element: $('#div-gallery'),
+                    maxMobileWidth: 768,
+                    numMobileImg: 2,
+                    maxTabletWidth: 1024,
+                    numTabletImg: 3
+                });
+            });
+            $(window).on('resize', function() {
+                myGallery.sizeGallery();
             });
         </script>
     </body>
