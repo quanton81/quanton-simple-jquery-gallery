@@ -68,11 +68,15 @@
                 text-align: center;
                 cursor: pointer;
                 background-color: #ccc;
-                color: #000; 
+                color: #000;
+                opacity: 0.6;
+                filter: alpha(opacity=60); /* For IE8 and earlier */
             }
             button.next-button:hover, button.prev-button:hover, button.close-button:hover, button.next-button:focus, button.prev-button:focus, button.close-button:focus {
-              background-color: #aaa;
-              color: #ccc;
+                background-color: #aaa;
+                color: #ccc;
+                opacity: 0.85;
+                filter: alpha(opacity=85); /* For IE8 and earlier */
             }
             button.next-button {
                 position: absolute;
